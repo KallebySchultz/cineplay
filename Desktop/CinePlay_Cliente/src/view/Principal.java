@@ -1,13 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package view;
 
 import controller.ConexaoController;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,16 +16,38 @@ public class Principal {
 
     public static void main(String[] args) {
         try {
+            System.out.println("Conectando ao servidor CinePlay...");
             Socket socket = new Socket("127.0.0.1", 12345);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             // com o OUT eu posso enviar coisas para o SERVIDOR
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             // com o IN eu posso receber coisas do SERVIDOR
             ccont = new ConexaoController(out, in);
-           TelaEntrada entrada = new TelaEntrada();
-           entrada.setVisible(true);
-        } catch (Exception e) {
+            System.out.println("✓ Conectado ao servidor com sucesso!");
+            
+            TelaEntrada entrada = new TelaEntrada();
+            entrada.setVisible(true);
+        } catch (java.net.ConnectException e) {
+            System.err.println("✗ ERRO: Não foi possível conectar ao servidor!");
+            System.err.println("  Verifique se o servidor está rodando em 127.0.0.1:12345");
+            JOptionPane.showMessageDialog(null, 
+                "Não foi possível conectar ao servidor!\n\n" +
+                "Verifique se:\n" +
+                "1. O servidor está rodando\n" +
+                "2. A porta 12345 está disponível\n" +
+                "3. Não há firewall bloqueando a conexão",
+                "Erro de Conexão",
+                JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
+            System.exit(1);
+        } catch (Exception e) {
+            System.err.println("✗ ERRO inesperado:");
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, 
+                "Erro inesperado ao conectar:\n" + e.getMessage(),
+                "Erro",
+                JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
         }
     }
 }

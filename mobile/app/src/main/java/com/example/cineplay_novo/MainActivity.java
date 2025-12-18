@@ -1,6 +1,8 @@
 package com.example.cineplay_novo;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
     private EditText edtNome, edtGmail, edtSenha;
     private Button btnCadastrar;
     public static ConexaoController ccont;
+    
+    // Configuração do servidor - altere aqui conforme necessário
+    private static final String SERVER_IP = "192.168.6.253"; // Altere para o IP do seu servidor
+    private static final int SERVER_PORT = 12345;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,11 +41,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // O cod vai aqui:
-// Referência aos componentes
+        // Referência aos componentes
 
         edtGmail = findViewById(R.id.idEmailLogin);
         edtSenha = findViewById(R.id.idSenhalLogin);
         btnCadastrar = findViewById(R.id.idEntrar);
+
+        // Conectar ao servidor em thread separada
+        connectToServer();
 
         // Clique do botão
         btnCadastrar.setOnClickListener(new View.OnClickListener() {
@@ -49,33 +59,69 @@ public class MainActivity extends AppCompatActivity {
                 String senha = edtSenha.getText().toString().trim();
 
                 // Verificação simples
-                if ( email.isEmpty() || senha.isEmpty()) {
+                if (email.isEmpty() || senha.isEmpty()) {
                     Toast.makeText(MainActivity.this,
                             "Preencha todos os campos!",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                // Verificar se está conectado ao servidor
+                if (ccont == null) {
+                    Toast.makeText(MainActivity.this,
+                            "Não conectado ao servidor! Tentando reconectar...",
+                            Toast.LENGTH_SHORT).show();
+                    connectToServer();
+                    return;
+                }
 
                 Toast.makeText(MainActivity.this,
                         "Login realizado com sucesso!",
                         Toast.LENGTH_SHORT).show();
-
-
-
             }
         });
-        try {
-            Socket socket = new Socket("192.168.6.253", 12345);
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            // com o OUT eu posso enviar coisas para o SERVIDOR
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-            // com o IN eu posso receber coisas do SERVIDOR
-            ccont = new ConexaoController(out, in);
+    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    private void connectToServer() {
+        // Conectar em thread separada para não bloquear UI
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Tentando conectar ao servidor " + SERVER_IP + ":" + SERVER_PORT + "...");
+                    Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                    out.flush(); // Important: flush to ensure header is sent
+                    ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+                    
+                    ccont = new ConexaoController(out, in);
+                    System.out.println("✓ Conectado ao servidor com sucesso!");
+                    
+                    // Mostrar mensagem na UI thread
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,
+                                    "Conectado ao servidor!",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (final Exception e) {
+                    System.err.println("✗ ERRO ao conectar ao servidor:");
+                    e.printStackTrace();
+                    
+                    // Mostrar erro na UI thread
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this,
+                                    "Erro ao conectar ao servidor: " + SERVER_IP + ":" + SERVER_PORT + "\n" +
+                                    "Verifique se o servidor está rodando e se o IP está correto.",
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 }
