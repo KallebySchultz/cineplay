@@ -89,6 +89,7 @@ public class CinemaDao {
             stmt.setString(2, c.getEndereco());
             stmt.setString(3, c.getCnpj());
             stmt.setString(4, c.getSenha());
+            stmt.setInt(5, c.getIdCinema());
             stmt.execute();
             stmt.close();
             con.close();

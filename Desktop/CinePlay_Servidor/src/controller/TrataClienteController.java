@@ -28,10 +28,11 @@ public class TrataClienteController extends Thread {
         this.cliente = cliente;
         this.idUnico = idUnico;
         try {
-            this.in = new ObjectInputStream(cliente.getInputStream());
             this.out = new ObjectOutputStream(cliente.getOutputStream());
-
+            this.out.flush(); // Important: flush to ensure header is sent
+            this.in = new ObjectInputStream(cliente.getInputStream());
         } catch (Exception e) {
+            System.err.println("Erro ao inicializar streams para cliente " + idUnico);
             e.printStackTrace();
         }
     }

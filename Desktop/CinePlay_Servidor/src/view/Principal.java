@@ -1,35 +1,64 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package view;
 
 import controller.TrataClienteController;
 import factory.Conector;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
 
 /**
  *
  * @author Usuário
  */
 public class Principal {
+    private static final int SERVER_PORT = 12345;
+    
     public static void main(String[] args) {
+        ServerSocket servidor = null;
         try {
-            if (Conector.getConnection() != null) {
-                System.out.println("Conectado ao banco cineplay!");
+            // Test database connection first
+            System.out.println("=== Iniciando Servidor CinePlay ===");
+            System.out.println("Verificando conexão com banco de dados...");
+            
+            Connection testCon = Conector.getConnection();
+            if (testCon != null && !testCon.isClosed()) {
+                System.out.println("✓ Conectado ao banco cineplay com sucesso!");
+            } else {
+                System.err.println("✗ ERRO: Não foi possível conectar ao banco de dados!");
+                System.err.println("  Verifique se o MySQL está rodando e se o banco 'cineplay' existe.");
+                System.exit(1);
             }
-            ServerSocket servidor = new ServerSocket(12345);
-            System.out.println("Servidor CinePlay inicializado. Aguardando conexões...");
+            
+            // Start server socket
+            System.out.println("Iniciando servidor na porta " + SERVER_PORT + "...");
+            servidor = new ServerSocket(SERVER_PORT);
+            System.out.println("✓ Servidor CinePlay inicializado com sucesso!");
+            System.out.println("Aguardando conexões de clientes...");
+            System.out.println("=====================================");
+            
             int idUnico = 0;
             while (true) {
                 Socket cliente = servidor.accept();
-                System.out.println("Novo cliente: " + cliente);
+                System.out.println("✓ Novo cliente conectado: " + cliente.getInetAddress().getHostAddress());
                 TrataClienteController tcc = new TrataClienteController(cliente, ++idUnico);
                 tcc.start();
             }
-        } catch (Exception e) {
+        } catch (java.net.BindException e) {
+            System.err.println("✗ ERRO: A porta " + SERVER_PORT + " já está em uso!");
+            System.err.println("  Verifique se outro servidor já está rodando.");
             e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("✗ ERRO ao iniciar servidor:");
+            e.printStackTrace();
+        } finally {
+            if (servidor != null && !servidor.isClosed()) {
+                try {
+                    servidor.close();
+                    System.out.println("Servidor encerrado.");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

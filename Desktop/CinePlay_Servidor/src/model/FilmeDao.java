@@ -16,16 +16,16 @@ public class FilmeDao {
     public ArrayList<Filme> getLista() {
         ArrayList<Filme> lista = new ArrayList<>();
         try {
-            String sql = "select * from filme where idCinema";
+            String sql = "SELECT * FROM filme";
             PreparedStatement stmt = con.prepareStatement(sql);
 
             ResultSet res = stmt.executeQuery();
             while (res.next()) {
                 Filme f = new Filme(res.getInt("idFilme"), res.getInt("idCinema"),
-                        res.getString("numeroPoltronas"),
                         res.getString("titulo"),
                         res.getString("descricao"),
                         res.getString("classificacao"),
+                        res.getString("numeroPoltronas"),
                         res.getFloat("preco"),
                         res.getString("dataInicio"),
                         res.getString("dataTermino"));
@@ -53,7 +53,7 @@ public class FilmeDao {
         try {
                //aqui mais um string sql
                
-            String sql = "insert into filme ( idCinema ,titulo, descricao, classificacao, numeroPoltronas, preco, dataInicio, dataTermino) values (?,?,?,?,?,?,?,?,?)";
+            String sql = "INSERT INTO filme (idCinema, titulo, descricao, classificacao, numeroPoltronas, preco, dataInicio, dataTermino) VALUES (?,?,?,?,?,?,?,?)";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setInt(1, f.getIdCinema());
             stmt.setString(2, f.getTitulo());
