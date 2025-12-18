@@ -1,0 +1,32 @@
+# NetBeans Build Artifacts
+Desktop/CinePlay_Cliente/build/
+Desktop/CinePlay_Cliente/dist/
+Desktop/CinePlay_Cliente/nbproject/private/
+Desktop/CinePlay_Servidor/build/
+Desktop/CinePlay_Servidor/dist/
+Desktop/CinePlay_Servidor/nbproject/private/
+
+# Gradle
+mobile/.gradle/
+mobile/build/
+mobile/app/build/
+mobile/local.properties
+
+# Android Studio
+mobile/.idea/
+mobile/*.iml
+mobile/.DS_Store
+mobile/captures/
+mobile/.externalNativeBuild/
+mobile/.cxx/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
