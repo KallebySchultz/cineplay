@@ -11,13 +11,15 @@ import javax.swing.JOptionPane;
  * @author Usuário
  */
 public class Principal {
-
+    private static final String SERVER_HOST = "127.0.0.1";
+    private static final int SERVER_PORT = 12345;
+    
     public static ConexaoController ccont;
 
     public static void main(String[] args) {
         try {
             System.out.println("Conectando ao servidor CinePlay...");
-            Socket socket = new Socket("127.0.0.1", 12345);
+            Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             // com o OUT eu posso enviar coisas para o SERVIDOR
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
@@ -29,13 +31,16 @@ public class Principal {
             entrada.setVisible(true);
         } catch (java.net.ConnectException e) {
             System.err.println("✗ ERRO: Não foi possível conectar ao servidor!");
-            System.err.println("  Verifique se o servidor está rodando em 127.0.0.1:12345");
-            JOptionPane.showMessageDialog(null, 
+            System.err.println("  Verifique se o servidor está rodando em " + SERVER_HOST + ":" + SERVER_PORT);
+            String errorMessage = String.format(
                 "Não foi possível conectar ao servidor!\n\n" +
                 "Verifique se:\n" +
-                "1. O servidor está rodando\n" +
-                "2. A porta 12345 está disponível\n" +
+                "1. O servidor está rodando em %s:%d\n" +
+                "2. A porta %d está disponível\n" +
                 "3. Não há firewall bloqueando a conexão",
+                SERVER_HOST, SERVER_PORT, SERVER_PORT);
+            JOptionPane.showMessageDialog(null, 
+                errorMessage,
                 "Erro de Conexão",
                 JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();

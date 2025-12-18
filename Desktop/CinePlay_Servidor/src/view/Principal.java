@@ -11,6 +11,8 @@ import java.sql.Connection;
  * @author Usuário
  */
 public class Principal {
+    private static final int SERVER_PORT = 12345;
+    
     public static void main(String[] args) {
         ServerSocket servidor = null;
         try {
@@ -28,8 +30,8 @@ public class Principal {
             }
             
             // Start server socket
-            System.out.println("Iniciando servidor na porta 12345...");
-            servidor = new ServerSocket(12345);
+            System.out.println("Iniciando servidor na porta " + SERVER_PORT + "...");
+            servidor = new ServerSocket(SERVER_PORT);
             System.out.println("✓ Servidor CinePlay inicializado com sucesso!");
             System.out.println("Aguardando conexões de clientes...");
             System.out.println("=====================================");
@@ -42,7 +44,7 @@ public class Principal {
                 tcc.start();
             }
         } catch (java.net.BindException e) {
-            System.err.println("✗ ERRO: A porta 12345 já está em uso!");
+            System.err.println("✗ ERRO: A porta " + SERVER_PORT + " já está em uso!");
             System.err.println("  Verifique se outro servidor já está rodando.");
             e.printStackTrace();
         } catch (Exception e) {

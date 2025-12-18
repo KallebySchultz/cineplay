@@ -114,9 +114,12 @@ public class MainActivity extends AppCompatActivity {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
+                            String errorMessage = String.format(
+                                "Erro ao conectar ao servidor: %s:%d\n\n" +
+                                "Verifique se o servidor está rodando e se o IP está correto.",
+                                SERVER_IP, SERVER_PORT);
                             Toast.makeText(MainActivity.this,
-                                    "Erro ao conectar ao servidor: " + SERVER_IP + ":" + SERVER_PORT + "\n" +
-                                    "Verifique se o servidor está rodando e se o IP está correto.",
+                                    errorMessage,
                                     Toast.LENGTH_LONG).show();
                         }
                     });
